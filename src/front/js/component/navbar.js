@@ -1,19 +1,33 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import "../../styles/Navbar.css"
 
-export const Navbar = () => {
-	return (
-		<nav className="navbar navbar-light bg-light">
-			<div className="container">
-				<Link to="/">
-					<span className="navbar-brand mb-0 h1">React Boilerplate</span>
-				</Link>
-				<div className="ml-auto">
-					<Link to="/demo">
-						<button className="btn btn-primary">Check the Context in action</button>
-					</Link>
-				</div>
-			</div>
-		</nav>
-	);
-};
+function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  return (
+    <nav className="navbar">
+      <div className="navbar-left">DulceYogurt</div>
+      <div className="navbar-right">
+        <button className="menu-button" onClick={toggleMenu}>
+          ☰
+        </button>
+        {isMenuOpen && (
+          <div className="dropdown-menu">
+            <a href="#perfil">Perfil</a>
+            <a href="#configuracion">Configuración</a>
+            <a href="#ventas">Ventas</a>
+            <a href="#cerrar-sesion">Cerrar Sesión</a>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+}
+
+export default Navbar;
+

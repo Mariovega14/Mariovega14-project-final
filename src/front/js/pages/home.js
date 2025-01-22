@@ -1,23 +1,22 @@
-import React, { Component, useContext } from "react";
+import React, { useContext } from "react";
+import { Context } from "../store/appContext.js";
 import "../../styles/home.css";
-import { Inicio } from "../component/Inicio.jsx";
-import { Ventas } from "../component/Ventas.jsx";
+import  Ventas  from "../pages/Ventas.jsx";
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 
 
 
 export const Home = () => {
-	const [user , setUser] = useState([]);
+	const [store , actions] = useContext(Context);
 
 	return (
-		<div className="Home">
-			{
-				!user.length > 0
-				?<Inicio setUser={setUser} />
-				:<Ventas user={user} />
-			}
-           
-         
-		 </div>
+		<>
+		{
+		store.token ? 
+        <Ventas/> :
+		<Navigate to ={"/inicio"}/>
+		}
+		</>
 	);
 };

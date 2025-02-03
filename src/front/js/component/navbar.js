@@ -5,11 +5,18 @@ import "../../styles/Navbar.css";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const { actions, store } = useContext(Context);
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = () => {
+    actions.logout(); // 
+    localStorage.removeItem("token"); 
+    window.location.reload(); 
+    navigate("/inicio"); 
   };
 
   return (
@@ -24,9 +31,14 @@ export const Navbar = () => {
           {isMenuOpen && (
             <div className="dropdown-menu">
               <a href="#perfil">Perfil</a>
+              {store.role === 'admin' && (
+                <Link to="/admin">Admin</Link> 
+              )}
               <a href="#configuracion">Configuración</a>
               <a href="#ventas">Ventas</a>
-              <a onClick={() => actions.logout()}>Cerrar Sesión</a>
+              
+              
+              <a onClick={handleLogout}>Cerrar Sesión</a> 
             </div>
           )}
         </div>
@@ -41,8 +53,8 @@ export const Navbar = () => {
           </button>
           {isMenuOpen && (
             <div className="dropdown-menu">
-             <Link to="/inicio">Iniciar Sesión</Link>
-             <Link to="/register">Registrarse</Link>
+              <Link to="/inicio">Iniciar Sesión</Link>
+              <Link to="/register">Registrarse</Link>
             </div>
           )}
         </div>

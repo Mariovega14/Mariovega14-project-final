@@ -1,0 +1,7 @@
+
+
+.ventas-product-list {
+    display: flex;
+    justify-content: center; 
+    margin-top: 2rem; 
+}

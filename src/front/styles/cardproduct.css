@@ -1,0 +1,15 @@
+.card {
+    width: 100%;  /* Hace que la tarjeta ocupe todo el ancho disponible dentro de su contenedor */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Sombra suave alrededor de las tarjetas */
+    transition: transform 0.3s ease;  /* Efecto de transición al pasar el mouse */
+}
+
+.card:hover {
+    transform: translateY(-5px);  /* Efecto de elevación al pasar el mouse sobre la tarjeta */
+}
+
+.card-img-top {
+    width: 100%;  /* Asegura que la imagen ocupe todo el ancho de la tarjeta */
+    height: 200px;  /* Fija la altura de las imágenes para que no varíen */
+    object-fit: cover;  /* Asegura que la imagen se recorte adecuadamente */
+}

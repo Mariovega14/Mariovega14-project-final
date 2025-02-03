@@ -1,0 +1,24 @@
+.product-list {
+    display: flex;
+    flex-wrap: wrap;  
+    gap: 1rem;  
+    justify-content: flex-end; 
+}
+
+.product-card {
+    flex: 1 1 calc(25% - 1rem);  
+    max-width: calc(25% - 1rem);  
+    box-sizing: border-box;  
+}
+
+@media (max-width: 768px) {
+    .product-card {
+        flex: 1 1 calc(50% - 1rem);  
+    }
+}
+
+@media (max-width: 480px) {
+    .product-card {
+        flex: 1 1 100%;  
+    }
+}

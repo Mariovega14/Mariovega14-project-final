@@ -1,0 +1,54 @@
+.user-list {
+    margin: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.user-list-title {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.user-list-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.user-list-table th,
+.user-list-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.user-list-table th {
+    background-color: #f2f2f2;
+}
+
+.user-list-table td {
+    background-color: #ffffff;
+}
+
+.user-list-table button {
+    margin-right: 8px;
+}
+
+.btn-danger {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}

@@ -12,7 +12,7 @@ const ProductList = () => {
             actions.getProducts();
             hasFetched.current = true;  
         }
-    }, [store.products.length, actions]);
+    }, []);
 
     return (
         <div className="product-list">

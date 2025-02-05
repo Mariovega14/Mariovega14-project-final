@@ -14,7 +14,7 @@ const UserList = () => {
         }
 
         actions.getUsers(); 
-    }, [store.token, actions, navigate]); 
+    }, [store.token,]); 
 
     return (
         <div className="user-list-container">

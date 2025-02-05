@@ -73,7 +73,7 @@ def login():
         else:
             if check_password_hash(user.password, f"{password}{user.salt}"):
                 # Crear el token incluyendo el role en el payload
-                token = create_access_token(identity=user.id, additional_claims={"role": user.role})
+                token = create_access_token(identity=str(user.id), additional_claims={"role": user.role})
                 return jsonify({"token": token, "role": user.role})  
             else:
                 return jsonify({"message": "Credenciales erradas"}), 400 
@@ -117,6 +117,46 @@ def add_product():
         "product_id": product.id,
         "image_url": image_url
     }), 201
+
+# @api.route('/products/<int:id>', methods=['PUT'])
+# def edit_product(id):
+#     product = Product.query.get(id)
+    
+#     if not product:
+#         return jsonify({"error": "Producto no encontrado"}), 404
+
+#     name = request.form.get("name")
+#     price = request.form.get("price")
+#     stock = request.form.get("stock", "false").lower() == "true"  
+
+#     if not name or price is None:
+#         return jsonify({"error": "Nombre y precio son obligatorios"}), 400
+
+#     # Si hay una nueva imagen, la subimos
+#     file = request.files.get("image")
+#     image_url = product.image_path  # Mantener la imagen existente si no se sube una nueva
+
+#     if file and allowed_file(file.filename):
+#         try:
+#             result = uploader.upload(file)  
+#             image_url = result["secure_url"]  
+#         except Exception as e:
+#             return jsonify({"error": f"Error al subir la imagen: {str(e)}"}), 500
+
+#     # Actualizar el producto con los nuevos datos
+#     product.name = name
+#     product.price = float(price)
+#     product.stock = stock
+#     product.image_path = image_url
+
+#     db.session.commit()
+
+#     return jsonify({
+#         "message": "Producto actualizado",
+#         "product_id": product.id,
+#         "image_url": image_url
+#     }), 200
+
 
 @api.route('/orders', methods=['POST'])
 def create_order():
@@ -186,7 +226,7 @@ def get_users():
             "id": user.id,
             "name": user.name,
             "email": user.email,
-            "role": user.role
+            "role": user.role,
         } for user in users]
 
         return jsonify({"users": users_list}), 200

@@ -21,7 +21,7 @@ const AddProduct = () => {
         if (!token) {
             navigate("/inicio");
         }
-    }, [navigate]);
+    }, []);
 
     const handleChange = ({ target }) => {
         setProduct({

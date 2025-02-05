@@ -15,7 +15,7 @@ const Ventas = () => {
         } else {
             actions.getProducts(); 
         }
-    }, [navigate, actions]); 
+    }, []); 
 
     const handleClick = () => {
         navigate("/producto"); 

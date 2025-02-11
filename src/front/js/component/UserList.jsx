@@ -18,7 +18,6 @@ const UserList = () => {
 
     return (
         <div className="user-list-container">
-            <h2>Lista de Usuarios</h2>
 
             <table className="user-list-table">
                 <thead>

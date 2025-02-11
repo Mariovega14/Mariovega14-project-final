@@ -1,15 +1,145 @@
+/* cardproduct.css */
+
+/* Estilos de la tarjeta */
 .card {
-    width: 100%;  /* Hace que la tarjeta ocupe todo el ancho disponible dentro de su contenedor */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Sombra suave alrededor de las tarjetas */
-    transition: transform 0.3s ease;  /* Efecto de transición al pasar el mouse */
+    width: 18rem;  
+    height: 350px; 
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 15px;
+    display: flex;
+    flex-direction: column;  
+    transition: transform 0.3s ease;
 }
 
 .card:hover {
-    transform: translateY(-5px);  /* Efecto de elevación al pasar el mouse sobre la tarjeta */
+    transform: translateY(-5px);
 }
 
 .card-img-top {
-    width: 100%;  /* Asegura que la imagen ocupe todo el ancho de la tarjeta */
-    height: 200px;  /* Fija la altura de las imágenes para que no varíen */
-    object-fit: cover;  /* Asegura que la imagen se recorte adecuadamente */
+    width: 100%;  
+    height: 180px; 
+    object-fit: cover; 
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.card-body {
+    padding: 15px;
+    flex-grow: 1;  
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.card-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.card-button {
+    padding: 8px 15px;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.card-button:hover {
+    background-color: #0056b3;
+}
+
+.edit-button {
+    padding: 5px 10px;
+    background-color: #ffc107;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: background-color 0.3s ease;
+}
+
+.edit-button:hover {
+    background-color: #e0a800;
+}
+
+
+/* Contenido del modal */
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* Fondo gris oscuro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Contenido del modal */
+.modal-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 30px; /* Más espacio dentro del modal */
+    border-radius: 12px;
+    width: 500px; /* Aumentamos el ancho para que quepa mejor el contenido */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    text-align: left;
+    z-index: 1100;
+}
+
+/* Estilos para los campos del formulario */
+.modal-content input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+/* Botones dentro del modal */
+.modal-content button {
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.modal-content button:hover {
+    background-color: #0056b3;
+}
+
+.modal-content button[type="button"] {
+    background-color: #dc3545;
+}
+
+.modal-content button[type="button"]:hover {
+    background-color: #c82333;
 }

@@ -22,3 +22,9 @@
         flex: 1 1 100%;  
     }
 }
+
+.out-of-stock-admin {
+    opacity: 0.2;  
+    border: 2px solid red;  
+    background-color: #f0f0f0;  
+}

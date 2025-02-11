@@ -9,6 +9,7 @@ import Product from "./pages/Product.jsx"
 import Ventas from "./pages/Ventas.jsx"
 import Inicio from "./pages/Inicio.jsx"
 import Admin from "./pages/Admin.jsx"
+import Order from "./pages/Order.jsx"
 import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
@@ -38,6 +39,7 @@ const Layout = () => {
                         <Route element={<Ventas />} path="/ventas" />
                         <Route element={<Product />} path="/producto" />
                         <Route element={<Admin />} path="/admin" />
+                        <Route element={<Order />} path="admin/:orders" />
                         <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<h1>Not found!</h1>} />

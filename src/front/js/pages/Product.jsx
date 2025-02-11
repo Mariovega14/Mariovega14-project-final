@@ -2,31 +2,32 @@ import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import Swal from "sweetalert2";
-import axios from "axios";
 
 const initialProductState = {
     name: "",
     price: "",
-    stock: true,  
+    stock: 0,  // Ahora es numérico
     image: null
 };
 
 const AddProduct = () => {
     const [product, setProduct] = useState(initialProductState);
-    const { actions } = useContext(Context);
+    const { store, actions } = useContext(Context);
     const navigate = useNavigate();
 
+    // Evitar acceso a vendedores
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) {
+        if (!store.token || store.role !== "admin") {
             navigate("/inicio");
         }
-    }, []);
+    }, [store.token, store.role]);
 
     const handleChange = ({ target }) => {
         setProduct({
             ...product,
-            [target.name]: target.value
+            [target.name]: target.name === "price" || target.name === "stock" 
+                ? Number(target.value) 
+                : target.value
         });
     };
 
@@ -37,36 +38,27 @@ const AddProduct = () => {
         });
     };
 
-    const handleStockChange = (event) => {
-        setProduct({
-            ...product,
-            stock: event.target.checked  
-        });
-    };
-
     const handleSubmit = async (event) => {
         event.preventDefault();
 
         const productData = new FormData();
         productData.append("name", product.name);
         productData.append("price", product.price);
-        productData.append("stock", product.stock);  
+        productData.append("stock", product.stock);
         if (product.image) {
-            productData.append("image", product.image); 
+            productData.append("image", product.image);
         }
 
-        try {
-            const response = await axios.post("https://urban-spoon-g45wqgpv4wxv2vvw5-3001.app.github.dev/api/products", productData);
+        const status = await actions.addProduct(productData);
 
-            if (response.status === 201) {
-                setProduct(initialProductState); 
-                Swal.fire("Producto creado", "El producto se ha creado correctamente.", "success");
-                navigate("/ventas"); 
-            } else {
-                Swal.fire("Error", "Hubo un problema, intente nuevamente.", "error");
-            }
-        } catch (error) {
-            Swal.fire("Error", "Hubo un problema con la conexión", "error");
+        if (status === 201) {
+            setProduct(initialProductState);
+            Swal.fire("Producto creado", "El producto se ha creado correctamente.", "success");
+            navigate("/ventas");
+        } else if (status === 403) {
+            Swal.fire("Acceso denegado", "No tienes permisos para agregar productos.", "error");
+        } else {
+            Swal.fire("Error", "Hubo un problema, intenta nuevamente.", "error");
         }
     };
 
@@ -102,16 +94,15 @@ const AddProduct = () => {
                         </div>
                         <div className="mb-3">
                             <label htmlFor="stock" className="form-label">Stock</label>
-                            <div>
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checked={product.stock}
-                                        onChange={handleStockChange}
-                                    />
-                                    Disponible en stock
-                                </label>
-                            </div>
+                            <input
+                                type="number"
+                                className="form-control"
+                                name="stock"
+                                placeholder="Cantidad en stock"
+                                value={product.stock}
+                                onChange={handleChange}
+                                required
+                            />
                         </div>
                         <div className="mb-3">
                             <label htmlFor="image" className="form-label">Imagen del Producto</label>

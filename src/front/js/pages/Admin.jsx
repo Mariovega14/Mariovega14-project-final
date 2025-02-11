@@ -1,7 +1,6 @@
 import React, { useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
-import ProductList from "../component/ProductList.jsx";  // Importar ProductList
 import UserList from "../component/UserList.jsx";
 import "../../styles/admin.css";
 
@@ -21,14 +20,12 @@ const Admin = () => {
             }
         }
 
-        // Obtener los últimos 4 productos
-        actions.getLatestProducts(4);  // Aquí solo obtenemos los últimos 4 productos
     }, []);
 
     return (
         <div className="admin-container">
             <div className="sidebar">
-                <h2 className="sidebar-title">Panel de Admin</h2>
+                <h1 className="sidebar-title">Panel de Admin</h1>
                 <ul className="sidebar-menu">
                     <li>
                         <Link to="/admin/dashboard" className="sidebar-link">Dashboard</Link>
@@ -59,16 +56,6 @@ const Admin = () => {
                         <p>Mostrar estadísticas generales (ventas, usuarios, productos, etc.)</p>
                     </div>
 
-                    <div className="section">
-                        <h2 className="section-title">Productos recientes</h2>
-                        <div className="grid grid-cols-4 gap-4">
-                            {store.latestProducts.length > 0 ? (
-                                <ProductList products={store.latestProducts} />
-                            ) : (
-                                <p>No hay productos recientes.</p>
-                            )}
-                        </div>
-                    </div>
 
                     <div className="section">
                         <h2 className="section-title">Órdenes recientes</h2>

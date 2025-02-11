@@ -22,7 +22,7 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
-    stock = db.Column(db.Boolean, nullable=False, default=True)
+    stock = db.Column(db.Integer, nullable=False, default=0)
     image_path = db.Column(db.String(255), nullable=True)
 
 class Order(db.Model):

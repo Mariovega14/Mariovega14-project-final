@@ -10,23 +10,48 @@ const ProductList = () => {
     useEffect(() => {
         if (!hasFetched.current && store.products.length === 0) {
             actions.getProducts();
-            hasFetched.current = true;  
+            hasFetched.current = true;
         }
-    }, []);
+    }, [store.products.length, actions]);
+
+    const userRole = store.role;  
+
+    // Ordenar productos: primero los que tienen stock, luego los que no
+    const sortedProducts = [...store.products].sort((a, b) => {
+        return a.stock === 0 ? 1 : b.stock === 0 ? -1 : 0;
+    });
 
     return (
         <div className="product-list">
-            {store.products.length > 0 ? (
-                store.products.map((product) => (
-                    <div key={product.id} className="product-card">
-                        <CardProduct
-                            name={product.name}
-                            price={product.price}
-                            stock={product.stock}
-                            image={product.image}
-                        />
-                    </div>
-                ))
+            {sortedProducts.length > 0 ? (
+                sortedProducts.map((product) => {
+                    const isOutOfStock = product.stock === 0;  
+                    const isAdmin = userRole === 'admin';
+                    const isSeller = userRole === 'vendedor';
+
+                    // Si es vendedor, ocultar productos sin stock
+                    if (isSeller && isOutOfStock) {
+                        return null;
+                    }
+
+                    // Clase especial para productos sin stock (visible solo para admin)
+                    const productClass = isOutOfStock && isAdmin ? 'out-of-stock-admin' : '';
+
+                    return (
+                        <div
+                            key={product.id}
+                            className={`product-card ${productClass}`}  
+                        >
+                            <CardProduct
+                                id={product.id}
+                                name={product.name}
+                                price={product.price}
+                                stock={product.stock}
+                                image={product.image}
+                            />
+                        </div>
+                    );
+                })
             ) : (
                 <p className="no-products">No hay productos disponibles</p>
             )}

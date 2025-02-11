@@ -1,4 +1,10 @@
 
+.ventas {
+    position: relative;
+    height: 100vh;  /* Esto asegura que ocupe todo el alto de la pantalla */
+    overflow: auto;  /* Esto asegura que el contenido pueda desplazarse si es necesario */
+}
+
 
 .ventas-product-list {
     display: flex;

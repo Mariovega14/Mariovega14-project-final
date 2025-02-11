@@ -13,7 +13,7 @@ export const Navbar = () => {
   };
 
   const handleLogout = () => {
-    actions.logout(); // 
+    actions.logout(); 
     localStorage.removeItem("token"); 
     window.location.reload(); 
     navigate("/inicio"); 
@@ -35,9 +35,7 @@ export const Navbar = () => {
                 <Link to="/admin">Admin</Link> 
               )}
               <a href="#configuracion">Configuración</a>
-              <a href="#ventas">Ventas</a>
-              
-              
+              <Link to="/ventas">Ventas</Link>  {/* Cambiado de <a> a <Link> */}
               <a onClick={handleLogout}>Cerrar Sesión</a> 
             </div>
           )}

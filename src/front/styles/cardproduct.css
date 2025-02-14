@@ -79,37 +79,36 @@
 }
 
 
-/* Contenido del modal */
-/* Modal Overlay */
+
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7); /* Fondo gris oscuro */
+    background: rgba(0, 0, 0, 0.7); 
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
 }
 
-/* Contenido del modal */
+
 .modal-content {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: white;
-    padding: 30px; /* Más espacio dentro del modal */
+    padding: 30px; 
     border-radius: 12px;
-    width: 500px; /* Aumentamos el ancho para que quepa mejor el contenido */
+    width: 500px; 
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
     text-align: left;
     z-index: 1100;
 }
 
-/* Estilos para los campos del formulario */
+
 .modal-content input {
     width: 100%;
     padding: 12px;
@@ -119,7 +118,7 @@
     font-size: 1rem;
 }
 
-/* Botones dentro del modal */
+
 .modal-content button {
     padding: 12px;
     background-color: #007bff;

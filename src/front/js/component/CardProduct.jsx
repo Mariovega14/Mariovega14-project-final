@@ -9,7 +9,7 @@ const CardProduct = ({ id, name, price, stock, image }) => {
     const [editedData, setEditedData] = useState({ name, price, stock });
 
     const handleEditClick = (e) => {
-        e.stopPropagation(); // Evita que el click en el botón active el evento de la tarjeta
+        e.stopPropagation(); 
         setIsOpen(true);
     };
 
@@ -30,11 +30,12 @@ const CardProduct = ({ id, name, price, stock, image }) => {
         };
 
         await actions.editProduct(id, formattedProduct);
+        await actions.getProducts();
         setEditedData(formattedProduct);
         setIsOpen(false);
     };
 
-    // ✅ Nueva función para agregar al carrito al hacer clic en la tarjeta
+
     const handleAddToCart = () => {
         if (stock > 0) {
             actions.addToCart({ id, name, price, stock, image });

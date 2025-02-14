@@ -33,6 +33,7 @@ class Order(db.Model):
 
     user = db.relationship("User", back_populates="orders")
     items = db.relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
+    invoice = db.relationship('Invoice', back_populates='order', uselist=False, cascade="all, delete-orphan")
 
 class OrderItem(db.Model):
     __tablename__ = "order_items"
@@ -43,3 +44,10 @@ class OrderItem(db.Model):
 
     order = db.relationship("Order", back_populates="items")
     product = db.relationship("Product")
+
+class Invoice(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False, unique=True)
+    file_url = db.Column(db.String(255), nullable=False)  # URL de la factura en Cloudinary
+
+    order = db.relationship('Order', back_populates='invoice')

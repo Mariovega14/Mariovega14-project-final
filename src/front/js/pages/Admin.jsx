@@ -28,7 +28,7 @@ const Admin = () => {
                 <h1 className="sidebar-title">Panel de Admin</h1>
                 <ul className="sidebar-menu">
                     <li>
-                        <Link to="/admin/dashboard" className="sidebar-link">Dashboard</Link>
+                        <Link to="/salesreport" className="sidebar-link">Reportes de Ventas</Link>
                     </li>
                     <li>
                         <Link to="/ventas" className="sidebar-link">Productos</Link>

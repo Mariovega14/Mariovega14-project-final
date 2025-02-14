@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useRef } from "react";
+import React, { useEffect, useContext, useRef, useState } from "react";
 import { Context } from "../store/appContext";
 import CardProduct from "../component/CardProduct.jsx";
 import "../../styles/productlist.css";
@@ -6,6 +6,7 @@ import "../../styles/productlist.css";
 const ProductList = () => {
     const { store, actions } = useContext(Context);
     const hasFetched = useRef(false);
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         if (!hasFetched.current && store.products.length === 0) {
@@ -14,47 +15,46 @@ const ProductList = () => {
         }
     }, [store.products.length, actions]);
 
-    const userRole = store.role;  
+    if (!store.products || !Array.isArray(store.products)) {
+        return <p className="no-products">Cargando productos...</p>;
+    }
 
-    // Ordenar productos: primero los que tienen stock, luego los que no
-    const sortedProducts = [...store.products].sort((a, b) => {
-        return a.stock === 0 ? 1 : b.stock === 0 ? -1 : 0;
-    });
+    const sortedProducts = [...store.products].sort((a, b) =>
+        a.stock === 0 ? 1 : b.stock === 0 ? -1 : 0
+    );
+
+    const filteredProducts = sortedProducts.filter((product) =>
+        product.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
-        <div className="product-list">
-            {sortedProducts.length > 0 ? (
-                sortedProducts.map((product) => {
-                    const isOutOfStock = product.stock === 0;  
-                    const isAdmin = userRole === 'admin';
-                    const isSeller = userRole === 'vendedor';
+        <div className="product-list-container">
+            <input
+                type="text"
+                placeholder="Buscar producto..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-bar"
+            />
 
-                    // Si es vendedor, ocultar productos sin stock
-                    if (isSeller && isOutOfStock) {
-                        return null;
-                    }
+            <div className="product-list">
+                {filteredProducts.length > 0 ? (
+                    filteredProducts.map((product) => {
+                        if (store.role === "vendedor" && product.stock === 0) return null;
 
-                    // Clase especial para productos sin stock (visible solo para admin)
-                    const productClass = isOutOfStock && isAdmin ? 'out-of-stock-admin' : '';
-
-                    return (
-                        <div
-                            key={product.id}
-                            className={`product-card ${productClass}`}  
-                        >
-                            <CardProduct
-                                id={product.id}
-                                name={product.name}
-                                price={product.price}
-                                stock={product.stock}
-                                image={product.image}
-                            />
-                        </div>
-                    );
-                })
-            ) : (
-                <p className="no-products">No hay productos disponibles</p>
-            )}
+                        return (
+                            <div
+                                key={product.id}
+                                className={`product-card ${product.stock === 0 && store.role === "admin" ? "out-of-stock-admin" : ""}`}
+                            >
+                                <CardProduct {...product} />
+                            </div>
+                        );
+                    })
+                ) : (
+                    <p className="no-products">No hay productos disponibles</p>
+                )}
+            </div>
         </div>
     );
 };

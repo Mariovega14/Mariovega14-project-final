@@ -1,13 +1,18 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, send_from_directory
-from api.models import db, User, Product, Order, OrderItem
-from api.utils import generate_sitemap, APIException
+from api.models import db, User, Product, Order, OrderItem, Invoice
+from api.utils import generate_sitemap, APIException, generate_invoice
 from flask_cors import CORS
-from werkzeug.security import generate_password_hash , check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import cloudinary.uploader as uploader
 from base64 import b64encode
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
+import tempfile
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from datetime import datetime, timedelta
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 api = Blueprint('api', __name__)
@@ -19,6 +24,7 @@ CORS(api)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+sales_report_bp = Blueprint("sales_report_bp", __name__)
 
 @api.route('/register', methods=['POST'])
 def add_new_user():
@@ -154,10 +160,16 @@ def edit_product(product_id):
         return jsonify({"error": f"Error al actualizar el producto: {str(e)}"}), 500
 
 
+import cloudinary.uploader
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import tempfile
+import os
+
 @api.route('/orders', methods=['POST'])
 @jwt_required()
 def create_order():
-    current_user_id = get_jwt_identity()  # Obtiene el usuario autenticado
+    current_user_id = get_jwt_identity()
     body = request.json
     items = body.get("items")
 
@@ -168,23 +180,55 @@ def create_order():
     if not user:
         return jsonify({"error": "Usuario no encontrado"}), 404
 
-    # Crear la orden
     order = Order(user_id=current_user_id)
     db.session.add(order)
     db.session.flush()
 
+    total_price = 0
     for item in items:
         product = Product.query.get(item["product_id"])
-        if not product or product.stock < item["quantity"]:  
+        if not product or product.stock < item["quantity"]:
             return jsonify({"error": f"Producto {item['product_id']} sin stock suficiente"}), 400
 
         order_item = OrderItem(order_id=order.id, product_id=product.id, quantity=item["quantity"])
         db.session.add(order_item)
 
-        product.stock -= item["quantity"]  
+        product.stock -= item["quantity"]
+        total_price += product.price * item["quantity"]
 
     db.session.commit()
-    return jsonify({"message": "Orden creada", "order_id": order.id}), 201
+
+    # 📄 Generar factura PDF
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+    pdf_path = temp_file.name
+
+    c = canvas.Canvas(pdf_path, pagesize=letter)
+    c.drawString(100, 750, f"Factura para la Orden #{order.id}")
+    c.drawString(100, 730, f"Cliente: {user.name}")
+    c.drawString(100, 710, f"Email: {user.email}")
+    c.drawString(100, 690, "Detalles de la compra:")
+
+    y_position = 670
+    for item in items:
+        product = Product.query.get(item["product_id"])
+        c.drawString(100, y_position, f"{product.name} - {item['quantity']} x ${product.price:.2f}")
+        y_position -= 20
+
+    c.drawString(100, y_position - 20, f"Total: ${total_price:.2f}")
+    c.save()
+
+    # ☁️ Subir a Cloudinary
+    upload_result = cloudinary.uploader.upload(pdf_path, resource_type="raw")
+
+    # 📌 Guardar URL en la base de datos
+    invoice = Invoice(order_id=order.id, file_url=upload_result["secure_url"])
+    db.session.add(invoice)
+    db.session.commit()
+
+    # 🗑️ Eliminar archivo temporal
+    os.remove(pdf_path)
+
+    return jsonify({"message": "Orden creada", "order_id": order.id, "invoice_url": upload_result["secure_url"]}), 201
 
 
 
@@ -241,8 +285,9 @@ def get_orders():
     if not current_user or current_user.role != "admin":
         return jsonify({"message": "No tienes permisos para ver esta información"}), 403
 
-    orders = db.session.query(Order).all()
-    
+    # 🔹 Ordenar las órdenes de la más reciente a la más antigua
+    orders = db.session.query(Order).order_by(Order.created_at.desc()).all()
+
     orders_list = [
         {
             "id": order.id,
@@ -266,3 +311,75 @@ def get_orders():
     ]
 
     return jsonify({"orders": orders_list}), 200
+
+@api.route('/orders/<int:order_id>/invoice', methods=['GET'])
+@jwt_required()
+def get_invoice(order_id):
+    """Devuelve la URL de la factura en Cloudinary para una orden específica"""
+    
+    order = Order.query.get(order_id)
+    if not order:
+        return jsonify({"error": "Orden no encontrada"}), 404
+
+    invoice = Invoice.query.filter_by(order_id=order.id).first()
+    if not invoice:
+        return jsonify({"error": "Factura no encontrada para esta orden"}), 404
+
+    return jsonify({
+        "message": "Factura encontrada",
+        "invoice_url": invoice.file_url
+    }), 200
+
+
+
+
+@api.route("/salesreport", methods=["GET"])
+def get_sales_report():
+    filter_type = request.args.get("filter", "daily")  # Opciones: daily, weekly, monthly, yearly
+
+    now = datetime.utcnow()
+    start_date = now  # Por defecto, hoy
+
+    if filter_type == "daily":
+        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif filter_type == "weekly":
+        start_date = now - timedelta(days=now.weekday())  # Inicio de la semana (lunes)
+    elif filter_type == "monthly":
+        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    elif filter_type == "yearly":
+        start_date = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    # Obtener todas las órdenes en el rango de fechas
+    orders = Order.query.filter(Order.created_at >= start_date).all()
+
+    total_sales = len(orders)  # Cantidad de ventas
+    total_revenue = 0.0  # Ingresos totales
+
+    product_summary = {}
+
+    for order in orders:
+        for item in order.items:
+            total_revenue += item.product.price * item.quantity
+
+            product_name = item.product.name
+            if product_name in product_summary:
+                product_summary[product_name]["quantity"] += item.quantity
+                product_summary[product_name]["revenue"] += item.product.price * item.quantity
+            else:
+                product_summary[product_name] = {
+                    "quantity": item.quantity,
+                    "revenue": item.product.price * item.quantity
+                }
+
+    return jsonify({
+        "total_sales": total_sales,
+        "total_revenue": total_revenue,
+        "products_sold": [
+            {
+                "name": name,
+                "quantity": data["quantity"],
+                "revenue": data["revenue"]
+            }
+            for name, data in product_summary.items()
+        ]
+    }), 200

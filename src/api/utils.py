@@ -1,4 +1,9 @@
 from flask import jsonify, url_for
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from flask import send_file
+
+
 
 class APIException(Exception):
     status_code = 400
@@ -20,6 +25,35 @@ def has_no_empty_params(rule):
     arguments = rule.arguments if rule.arguments is not None else ()
     return len(defaults) >= len(arguments)
 
+
+
+
+
+def generate_invoice(order, file_path):
+    """Genera un PDF de factura y lo guarda en file_path."""
+    
+    c = canvas.Canvas(file_path, pagesize=letter)
+    c.drawString(100, 750, f"Factura - Orden #{order.id}")
+    c.drawString(100, 730, f"Cliente: {order.user.name}")
+    c.drawString(100, 710, f"Fecha: {order.created_at.strftime('%Y-%m-%d')}")
+
+    y_position = 680
+    c.drawString(100, y_position, "Productos vendidos:")
+    y_position -= 20
+
+    total = 0
+    for item in order.items:
+        line = f"{item.product.name} - Cantidad: {item.quantity} - Precio: ${item.product.price}"
+        c.drawString(100, y_position, line)
+        y_position -= 20
+        total += item.product.price * item.quantity
+
+    c.drawString(100, y_position - 20, f"Total: ${total}")
+
+    c.save()
+    return file_path
+
+
 def generate_sitemap(app):
     links = ['/admin/']
     for rule in app.url_map.iter_rules():
@@ -29,6 +63,8 @@ def generate_sitemap(app):
             url = url_for(rule.endpoint, **(rule.defaults or {}))
             if "/admin/" not in url:
                 links.append(url)
+
+
 
     links_html = "".join(["<li><a href='" + y + "'>" + y + "</a></li>" for y in links])
     return """

@@ -8,6 +8,8 @@ const getState = ({ getStore, getActions, setStore }) => {
             latestProducts: [],
             cart: [],
             orders: [],
+            salesReports: null
+            
         },
         actions: {
             register: async (user) => {
@@ -266,6 +268,29 @@ const getState = ({ getStore, getActions, setStore }) => {
                 } catch (error) {
                     console.error("Error en getOrders:", error);
                 }
+            },
+
+            getSalesReport: async (filter = "daily") => {
+                try {
+                  const token = localStorage.getItem("token");
+                  const response = await fetch(`${process.env.BACKEND_URL}/salesreport?filter=${filter}`,
+                    {
+                      method: "GET",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                    }
+                  );
+        
+                  if (!response.ok) throw new Error("Error al obtener el reporte");
+        
+                  const data = await response.json();
+                  setStore({ salesReport: data }); // Guardamos los datos en el store
+                } catch (error) {
+                  console.error("Error al obtener reporte de ventas:", error);
+                }
+            
             },
         },
     };

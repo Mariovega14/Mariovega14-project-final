@@ -1,13 +1,38 @@
-
-.ventas {
-    position: relative;
-    height: 100vh;  /* Esto asegura que ocupe todo el alto de la pantalla */
-    overflow: auto;  /* Esto asegura que el contenido pueda desplazarse si es necesario */
+/* ===== Estilos Generales ===== */
+.container {
+    max-width: 1400px;  /* Aumentamos el ancho del container */
+    margin: auto;
+    padding: 30px;  /* Más padding para evitar que los elementos se vean pegados */
+    font-family: "Arial", sans-serif;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-
+/* ===== Lista de productos ===== */
 .ventas-product-list {
-    display: flex;
-    justify-content: center; 
-    margin-top: 2rem; 
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Aumentamos el tamaño mínimo */
+    gap: 25px; /* Más espacio entre productos */
+    padding: 20px;
+}
+
+/* ===== Botones ===== */
+.btn {
+    font-size: 1.1rem;
+    padding: 12px 24px;
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .ventas-product-list {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
 }

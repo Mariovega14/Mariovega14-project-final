@@ -1,98 +1,206 @@
-/* Estilos generales */
 .orders-page {
-    max-width: 900px;
-    margin: 0 auto;
+    max-width: 800px;
+    margin: 20px auto;
     padding: 20px;
-    font-family: Arial, sans-serif;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
     text-align: center;
+    font-size: 26px;
+    margin-bottom: 20px;
     color: #333;
 }
 
-/* Lista de órdenes */
+.filters {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.filter-input, .filter-select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    flex: 1;
+}
+
 .orders-list {
     list-style: none;
     padding: 0;
 }
 
 .order-item {
-    background: #fff;
+    background: #f9f9f9;
     padding: 15px;
-    margin: 10px 0;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    border-left: 5px solid #007bff;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 12px;
+    transition: background 0.3s;
 }
 
 .order-item:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background: #e9ecef;
 }
 
-/* Modal de orden */
-.order-modal,
-.modal-overlay {
+/* MODAL DE DETALLES DE LA ORDEN */
+.order-modal {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 1000;
-}
-
-.order-modal {
     background: white;
-    padding: 20px;
-    border-radius: 10px;
+    padding: 25px;
+    border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    width: 400px;
-    max-width: 90%;
+    z-index: 1000;
+    width: 90%;
+    max-width: 500px;
 }
 
-.order-modal h3 {
-    text-align: center;
-    color: #333;
-}
-
-.order-modal ul {
-    list-style: none;
-    padding: 0;
-}
-
-.order-modal li {
-    background: #f9f9f9;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-}
-
-.order-modal p {
-    margin: 5px 0;
-}
-
+/* Fondo oscuro detrás del modal */
 .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
 }
 
-/* Botón de cerrar */
+/* Estilo para los detalles de la orden */
+.order-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.order-details p {
+    margin: 5px 0;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Tabla de productos */
+.order-items {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.order-items th,
+.order-items td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.order-items th {
+    background: #007bff;
+    color: white;
+}
+
+.order-items tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+/* Botón de cierre */
+.close-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 15px;
+    font-size: 16px;
+}
+
+.close-btn:hover {
+    background: #c82333;
+}
+
+.order-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    width: 500px;
+    font-family: Arial, sans-serif;
+}
+
+/* Encabezado de la factura */
+.invoice-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.invoice-header h3 {
+    margin: 0;
+    font-size: 22px;
+    color: #333;
+}
+
+.invoice-header p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Tabla de productos */
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.invoice-table th, .invoice-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.invoice-table th {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Total de la orden */
+.invoice-total {
+    text-align: right;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Botón para cerrar */
 .close-btn {
     display: block;
     width: 100%;
     padding: 10px;
-    margin-top: 15px;
-    background: #ff4d4d;
+    background: #dc3545;
     color: white;
     border: none;
+    cursor: pointer;
     border-radius: 5px;
     text-align: center;
-    cursor: pointer;
-    transition: background 0.3s;
+    margin-top: 10px;
 }
 
 .close-btn:hover {
-    background: #cc0000;
+    background: #c82333;
 }

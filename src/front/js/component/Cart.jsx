@@ -1,9 +1,10 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import "../../styles/cart.css";
 
 const Cart = ({ onClose }) => {
     const { store, actions } = useContext(Context);
+    const [isFadingOut, setIsFadingOut] = useState(false); // Estado para el fade-out
 
     const handleRemove = (productId) => {
         actions.removeFromCart(productId);
@@ -18,8 +19,13 @@ const Cart = ({ onClose }) => {
     };
 
     const handleCheckout = async () => {
-        await actions.createOrder();
-        onClose(); 
+        await actions.createOrder(); 
+
+        setIsFadingOut(true); 
+        setTimeout(() => {
+            actions.getProducts(); 
+            onClose(); 
+        }, 500); 
     };
 
     // Calcular total del carrito
@@ -27,7 +33,7 @@ const Cart = ({ onClose }) => {
     const totalItems = store.cart.reduce((acc, item) => acc + item.quantity, 0);
 
     return (
-        <div className="cart-overlay">
+        <div className={`cart-overlay ${isFadingOut ? "fade-out" : ""}`}>
             <div className="cart-content">
                 <button className="close-button" onClick={onClose}>✖</button>
                 <h2>Carrito de Compras</h2>

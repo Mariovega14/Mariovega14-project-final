@@ -30,11 +30,9 @@ export const Navbar = () => {
           </button>
           {isMenuOpen && (
             <div className="dropdown-menu">
-              <a href="#perfil">Perfil</a>
               {store.role === 'admin' && (
                 <Link to="/admin">Admin</Link> 
               )}
-              <a href="#configuracion">Configuración</a>
               <Link to="/ventas">Ventas</Link>  {/* Cambiado de <a> a <Link> */}
               <a onClick={handleLogout}>Cerrar Sesión</a> 
             </div>

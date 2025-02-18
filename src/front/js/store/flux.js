@@ -33,18 +33,28 @@ const getState = ({ getStore, getActions, setStore }) => {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(user),
                     });
+            
                     const data = await response.json();
+            
+                    if (response.status === 403) {
+                        alert("Tu cuenta ha sido deshabilitada. Contacta al administrador.");
+                        return 403;  // Código de error para usuario deshabilitado
+                    }
+            
                     if (response.ok) {
                         setStore({ token: data.token, role: data.role });
                         localStorage.setItem("token", data.token);
                         localStorage.setItem("role", data.role);
+                        return 200;  // Éxito
                     }
-                    return response.status;
+            
+                    return response.status;  // Otros errores (credenciales erradas, etc.)
                 } catch (error) {
                     console.error("Error en inicio:", error);
-                    return 500;
+                    return 500;  // Error del servidor
                 }
             },
+            
 
             logout: () => {
                 setStore({ token: null, role: null });
@@ -132,45 +142,92 @@ const getState = ({ getStore, getActions, setStore }) => {
             deleteProduct: async (productId) => {
                 try {
                     const store = getStore();
-                    if (store.role !== "admin") return 403;
-
-                    const response = await fetch(`${process.env.BACKEND_URL}/products/${productId}`, {
+            
+                    // 🔹 Verificar si el usuario es admin antes de proceder
+                    if (store.role !== "admin") {
+                        console.error("Acceso denegado: el usuario no tiene permisos de administrador.");
+                        return { status: 403, message: "No tienes permisos para eliminar productos." };
+                    }
+            
+                    // 🔹 Verificar que la URL del backend está definida
+                    const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000";
+                    
+                    // 🔹 Realizar la solicitud DELETE
+                    const response = await fetch(`${BACKEND_URL}/products/${productId}`, {
                         method: "DELETE",
                         headers: { Authorization: `Bearer ${store.token}` },
                     });
-
-                    if (!response.ok) throw new Error("No se pudo eliminar el producto");
-
-                    getActions().getProducts();
-                    return 200;
+            
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("Error en la respuesta del backend:", errorText);
+                        return { status: response.status, message: "No se pudo eliminar el producto." };
+                    }
+            
+                    // 🔹 Actualizar el store eliminando el producto de la lista sin recargar desde la API
+                    setStore({
+                        products: store.products.filter(product => product.id !== productId),
+                    });
+            
+                    console.log(`Producto con ID ${productId} eliminado exitosamente.`);
+                    return { status: 200, message: "Producto eliminado exitosamente." };
+                    
                 } catch (error) {
                     console.error("Error en deleteProduct:", error);
-                    return 500;
+                    return { status: 500, message: "Error en el servidor al eliminar el producto." };
                 }
             },
 
             getUsers: async () => {
                 try {
-                    const store = getStore();
-                    if (store.users.length > 0) return;
-
                     const response = await fetch(`${process.env.BACKEND_URL}/users`, {
                         method: "GET",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${store.token}`,
+                            Authorization: `Bearer ${getStore().token}`, // Obtener token del store
                         },
                     });
-
-                    if (!response.ok) throw new Error("No se pudieron obtener los usuarios");
-
+            
+                    if (!response.ok) {
+                        throw new Error("No se pudieron obtener los usuarios");
+                    }
+            
                     const data = await response.json();
-                    setStore({ users: data.users });
-
+            
+                    setStore({ users: data.users }); // Guardar la lista de usuarios en el store
+            
                 } catch (error) {
                     console.error("Error en getUsers:", error);
                 }
             },
+            
+            toggleUserStatus: async (userId) => {
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}/users/${userId}/toggle-status`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${getStore().token}`, // Token del store
+                        },
+                    });
+            
+                    const data = await response.json();
+            
+                    if (!response.ok) {
+                        throw new Error(data.message || "Error al cambiar el estado del usuario");
+                    }
+            
+                    // 🔹 Actualizar la lista de usuarios en el store
+                    const updatedUsers = getStore().users.map(user => 
+                        user.id === userId ? { ...user, is_active: data.is_active } : user
+                    );
+                    setStore({ users: updatedUsers });
+            
+                } catch (error) {
+                    console.error("Error en toggleUserStatus:", error);
+                }
+            },
+            
 
             addToCart: (product, quantity = 1) => {
                 const store = getStore();
@@ -270,10 +327,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            getSalesReport: async (filter = "daily") => {
+            getSalesReport: async (startDate, endDate) => {
                 try {
                   const token = localStorage.getItem("token");
-                  const response = await fetch(`${process.env.BACKEND_URL}/salesreport?filter=${filter}`,
+                  const response = await fetch(
+                    `${process.env.BACKEND_URL}/salesreport?start_date=${startDate}&end_date=${endDate}`,
                     {
                       method: "GET",
                       headers: {
@@ -282,16 +340,16 @@ const getState = ({ getStore, getActions, setStore }) => {
                       },
                     }
                   );
-        
+              
                   if (!response.ok) throw new Error("Error al obtener el reporte");
-        
+              
                   const data = await response.json();
-                  setStore({ salesReport: data }); // Guardamos los datos en el store
+                  setStore({ salesReport: data });
                 } catch (error) {
                   console.error("Error al obtener reporte de ventas:", error);
                 }
-            
             },
+            
         },
     };
 };

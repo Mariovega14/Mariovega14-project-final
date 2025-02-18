@@ -1,0 +1,91 @@
+/* Contenedor principal */
+.usuarios-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Título principal */
+.usuarios-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Tabla de usuarios */
+.usuarios-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.usuarios-table th, .usuarios-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+.usuarios-table th {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+/* Filas alternas para mejor visibilidad */
+.usuarios-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Botones */
+.edit-btn, .save-btn, .cancel-btn {
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 2px;
+    font-size: 14px;
+}
+
+/* Botón Editar */
+.edit-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Botón Guardar */
+.save-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: #218838;
+}
+
+/* Botón Cancelar */
+.cancel-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #c82333;
+}
+
+/* Checkbox para activar/desactivar usuario */
+.usuarios-table input[type="checkbox"] {
+    transform: scale(1.3);
+    cursor: pointer;
+}

@@ -70,22 +70,27 @@ def login():
         password = body.get("password", None)
 
         if email is None or password is None:
-            return jsonify({"message" :"Necesitamos email y password"}), 400   
+            return jsonify({"message": "Necesitamos email y password"}), 400   
 
         user = User.query.filter_by(email=email).one_or_none()
 
         if user is None:
             return jsonify({"message": "Credenciales erradas"}), 400 
+        
+        # 🔹 Verificar si el usuario está deshabilitado
+        if not user.is_active:
+            return jsonify({"message": "Tu cuenta ha sido deshabilitada. Contacta al administrador."}), 403
+
+        # 🔹 Verificar credenciales
+        if check_password_hash(user.password, f"{password}{user.salt}"):
+            token = create_access_token(identity=str(user.id), additional_claims={"role": user.role})
+            return jsonify({"token": token, "role": user.role})  
         else:
-            if check_password_hash(user.password, f"{password}{user.salt}"):
-                # Crear el token incluyendo el role en el payload
-                token = create_access_token(identity=str(user.id), additional_claims={"role": user.role})
-                return jsonify({"token": token, "role": user.role})  
-            else:
-                return jsonify({"message": "Credenciales erradas"}), 400 
+            return jsonify({"message": "Credenciales erradas"}), 400 
 
     except Exception as err:
-        return jsonify(f"Error: {err}")
+        return jsonify(f"Error: {err}"), 500
+
     
 @api.route('/products', methods=['POST'])
 @jwt_required()
@@ -129,6 +134,31 @@ def add_product():
         "image_url": image_url
     }), 201
 
+@api.route('/products/<int:product_id>', methods=['DELETE'])
+@jwt_required()  
+def delete_product(product_id):
+    current_user_id = get_jwt_identity()  
+    current_user = User.query.get(current_user_id)
+
+    # 🔹 Verificar si el usuario es administrador
+    if not current_user or current_user.role != "admin":
+        return jsonify({"message": "No tienes permisos para eliminar productos"}), 403
+
+    # 🔹 Buscar el producto en la base de datos
+    product = Product.query.get(product_id)
+
+    if not product:
+        return jsonify({"error": "Producto no encontrado"}), 404
+
+    try:
+        db.session.delete(product)  # Eliminar producto
+        db.session.commit()  # Guardar cambios en la base de datos
+
+        return jsonify({"message": "Producto eliminado exitosamente"}), 200
+    except Exception as e:
+        db.session.rollback()  # Revertir en caso de error
+        return jsonify({"error": f"Error al eliminar el producto: {str(e)}"}), 500
+
 @api.route('/products/<int:product_id>', methods=['PUT'])
 @jwt_required()
 def edit_product(product_id):
@@ -160,11 +190,6 @@ def edit_product(product_id):
         return jsonify({"error": f"Error al actualizar el producto: {str(e)}"}), 500
 
 
-import cloudinary.uploader
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-import tempfile
-import os
 
 @api.route('/orders', methods=['POST'])
 @jwt_required()
@@ -198,7 +223,7 @@ def create_order():
 
     db.session.commit()
 
-    # 📄 Generar factura PDF
+    
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
     pdf_path = temp_file.name
 
@@ -217,15 +242,15 @@ def create_order():
     c.drawString(100, y_position - 20, f"Total: ${total_price:.2f}")
     c.save()
 
-    # ☁️ Subir a Cloudinary
+    
     upload_result = cloudinary.uploader.upload(pdf_path, resource_type="raw")
 
-    # 📌 Guardar URL en la base de datos
+    
     invoice = Invoice(order_id=order.id, file_url=upload_result["secure_url"])
     db.session.add(invoice)
     db.session.commit()
 
-    # 🗑️ Eliminar archivo temporal
+   
     os.remove(pdf_path)
 
     return jsonify({"message": "Orden creada", "order_id": order.id, "invoice_url": upload_result["secure_url"]}), 201
@@ -254,7 +279,6 @@ def get_users():
     try:
         current_user_id = get_jwt_identity()  
         current_user = User.query.get(current_user_id)  
-        print (current_user_id)
 
         if not current_user:
             return jsonify({"message": "Usuario no encontrado"}), 404
@@ -268,13 +292,15 @@ def get_users():
             "name": user.name,
             "email": user.email,
             "role": user.role,
+            "is_active": user.is_active  # ➡️ Agregar estado activo/inactivo
         } for user in users]
 
         return jsonify({"users": users_list}), 200
 
     except Exception as e:
         print(f"Error en get_users: {e}")  
-        return jsonify({"message": "Ha ocurrido un error"}), 500  
+        return jsonify({"message": "Ha ocurrido un error"}), 500
+  
     
 @api.route('/orders', methods=['GET'])
 @jwt_required()  
@@ -285,7 +311,7 @@ def get_orders():
     if not current_user or current_user.role != "admin":
         return jsonify({"message": "No tienes permisos para ver esta información"}), 403
 
-    # 🔹 Ordenar las órdenes de la más reciente a la más antigua
+    
     orders = db.session.query(Order).order_by(Order.created_at.desc()).all()
 
     orders_list = [
@@ -335,32 +361,28 @@ def get_invoice(order_id):
 
 @api.route("/salesreport", methods=["GET"])
 def get_sales_report():
-    filter_type = request.args.get("filter", "daily")  # Opciones: daily, weekly, monthly, yearly
+    start_date_str = request.args.get("start_date", None)  
+    end_date_str = request.args.get("end_date", None)  
 
-    now = datetime.utcnow()
-    start_date = now  # Por defecto, hoy
+    if not start_date_str or not end_date_str:
+        return jsonify({"error": "Debes proporcionar start_date y end_date en formato YYYY-MM-DD"}), 400
 
-    if filter_type == "daily":
-        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    elif filter_type == "weekly":
-        start_date = now - timedelta(days=now.weekday())  # Inicio de la semana (lunes)
-    elif filter_type == "monthly":
-        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    elif filter_type == "yearly":
-        start_date = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+    try:
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d") + timedelta(days=1)  
+    except ValueError:
+        return jsonify({"error": "Formato de fecha inválido. Usa YYYY-MM-DD"}), 400
 
-    # Obtener todas las órdenes en el rango de fechas
-    orders = Order.query.filter(Order.created_at >= start_date).all()
+    
+    orders = Order.query.filter(Order.created_at >= start_date, Order.created_at < end_date).all()
 
-    total_sales = len(orders)  # Cantidad de ventas
-    total_revenue = 0.0  # Ingresos totales
-
+    total_sales = len(orders)
+    total_revenue = 0.0
     product_summary = {}
 
     for order in orders:
         for item in order.items:
             total_revenue += item.product.price * item.quantity
-
             product_name = item.product.name
             if product_name in product_summary:
                 product_summary[product_name]["quantity"] += item.quantity
@@ -383,3 +405,23 @@ def get_sales_report():
             for name, data in product_summary.items()
         ]
     }), 200
+    
+@api.route('/users/<int:user_id>/toggle-status', methods=['PUT'])
+@jwt_required()
+def toggle_user_status(user_id):
+    """Habilita o deshabilita un usuario (solo admin)"""
+    
+    admin_id = get_jwt_identity()  
+    admin = User.query.get(admin_id)
+
+    if not admin or admin.role != "admin":
+        return jsonify({"error": "Acceso no autorizado"}), 403  
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    user.is_active = not user.is_active  
+    db.session.commit()
+
+    return jsonify({"message": f"Usuario {'habilitado' if user.is_active else 'deshabilitado'}", "is_active": user.is_active}), 200

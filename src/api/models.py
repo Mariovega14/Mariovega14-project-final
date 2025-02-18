@@ -10,6 +10,7 @@ class User(db.Model):
     password = db.Column(db.String(180), nullable=False)
     salt = db.Column(db.String(120), nullable=False)
     role = db.Column(db.String(50), nullable=False, default='vendedor')
+    is_active = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime(timezone=True), default=db.func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=db.func.now(), onupdate=db.func.now())
 

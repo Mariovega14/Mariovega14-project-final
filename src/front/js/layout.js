@@ -9,6 +9,7 @@ import Product from "./pages/Product.jsx"
 import Ventas from "./pages/Ventas.jsx"
 import Inicio from "./pages/Inicio.jsx"
 import Admin from "./pages/Admin.jsx"
+import Usuarios from "./pages/Usuarios.jsx"
 import Order from "./pages/Order.jsx"
 import SalesReport from "./pages/SalesReport.jsx"
 import { Demo } from "./pages/demo";
@@ -42,6 +43,7 @@ const Layout = () => {
                         <Route element={<SalesReport />} path="/salesreport" />
                         <Route element={<Admin />} path="/admin" />
                         <Route element={<Order />} path="admin/:orders" />
+                        <Route element={<Usuarios />} path="/admin/usuarios" />
                         <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<h1>Not found!</h1>} />

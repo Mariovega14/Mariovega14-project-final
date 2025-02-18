@@ -8,11 +8,13 @@ const CardProduct = ({ id, name, price, stock, image }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [editedData, setEditedData] = useState({ name, price, stock });
 
+    // 🔹 Función para abrir el modal de edición
     const handleEditClick = (e) => {
-        e.stopPropagation(); 
+        e.stopPropagation();
         setIsOpen(true);
     };
 
+    // 🔹 Manejo de cambios en los inputs del modal
     const handleChange = (e) => {
         const { name, value } = e.target;
         setEditedData({
@@ -21,6 +23,7 @@ const CardProduct = ({ id, name, price, stock, image }) => {
         });
     };
 
+    // 🔹 Función para guardar los cambios editados
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formattedProduct = {
@@ -35,7 +38,18 @@ const CardProduct = ({ id, name, price, stock, image }) => {
         setIsOpen(false);
     };
 
+    
+    const handleDelete = async (e) => {
+        e.stopPropagation(); 
 
+        const confirmDelete = window.confirm(`¿Estás seguro de que deseas eliminar "${name}"?`);
+        if (confirmDelete) {
+            await actions.deleteProduct(id); 
+            await actions.getProducts();  
+        }
+    };
+
+    
     const handleAddToCart = () => {
         if (stock > 0) {
             actions.addToCart({ id, name, price, stock, image });
@@ -44,24 +58,28 @@ const CardProduct = ({ id, name, price, stock, image }) => {
 
     return (
         <>
-            
             <div className="card" onClick={handleAddToCart}>
                 <img src={image} className="card-img-top" alt={name} />
                 <div className="card-body">
                     <h5 className="card-title">{name}</h5>
                     <p className="card-text">Precio: ${price}</p>
                     <p className="card-text">Stock disponible: {stock}</p>
-                    
-                    
+
                     
                     {store.role === "admin" && (
-                        <button className="edit-button" onClick={handleEditClick}>
-                            ✏️
-                        </button>
+                        <div className="admin-buttons">
+                            <button className="edit-button" onClick={handleEditClick}>
+                                ✏️ Editar
+                            </button>
+                            <button className="delete-button" onClick={handleDelete}>
+                                🗑️ Eliminar
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
 
+            {/* Modal de Edición */}
             {isOpen &&
                 ReactDOM.createPortal(
                     <>

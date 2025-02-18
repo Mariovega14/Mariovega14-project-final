@@ -3,22 +3,38 @@ import { Context } from "../store/appContext";
 
 const SalesReport = () => {
   const { store, actions } = useContext(Context);
-  const [filter, setFilter] = useState("daily");
+  const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
+  const [endDate, setEndDate] = useState(new Date().toISOString().split("T")[0]);
 
   useEffect(() => {
-    actions.getSalesReport(filter);
-  }, [filter]);
+    actions.getSalesReport(startDate, endDate);
+  }, [startDate, endDate]);
 
   return (
     <div className="container mt-4">
       <h2>Reporte de Ventas</h2>
 
-      <select className="form-select" value={filter} onChange={(e) => setFilter(e.target.value)}>
-        <option value="daily">Diario</option>
-        <option value="weekly">Semanal</option>
-        <option value="monthly">Mensual</option>
-        <option value="yearly">Anual</option>
-      </select>
+      <div className="d-flex gap-3">
+        <div>
+          <label>Fecha de Inicio:</label>
+          <input
+            type="date"
+            className="form-control"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label>Fecha de Fin:</label>
+          <input
+            type="date"
+            className="form-control"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </div>
+      </div>
 
       {store.salesReport ? (
         <div className="mt-3">

@@ -4,6 +4,7 @@ from api.utils import generate_sitemap, APIException, generate_invoice
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import cloudinary
 import cloudinary.uploader as uploader
 from base64 import b64encode
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity

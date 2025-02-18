@@ -21,7 +21,7 @@ const Admin = () => {
 
     return (
         <div className="admin-container">
-            {/* Barra lateral */}
+            
             <aside className="sidebar">
                 <h1 className="sidebar-title">Panel de Admin</h1>
                 <ul className="sidebar-menu">
@@ -40,7 +40,7 @@ const Admin = () => {
                 </ul>
             </aside>
 
-            {/* Contenido principal */}
+            
             <main className="main-content">
                 <header className="main-header">
                     <h1>Bienvenido al Panel de Administración</h1>

@@ -149,10 +149,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                         return { status: 403, message: "No tienes permisos para eliminar productos." };
                     }
             
-                    // 🔹 Verificar que la URL del backend está definida
+                    
                     const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000";
                     
-                    // 🔹 Realizar la solicitud DELETE
+                    
                     const response = await fetch(`${BACKEND_URL}/products/${productId}`, {
                         method: "DELETE",
                         headers: { Authorization: `Bearer ${store.token}` },
@@ -164,7 +164,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         return { status: response.status, message: "No se pudo eliminar el producto." };
                     }
             
-                    // 🔹 Actualizar el store eliminando el producto de la lista sin recargar desde la API
+                    
                     setStore({
                         products: store.products.filter(product => product.id !== productId),
                     });
@@ -184,7 +184,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         method: "GET",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${getStore().token}`, // Obtener token del store
+                            Authorization: `Bearer ${getStore().token}`, 
                         },
                     });
             
@@ -194,7 +194,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             
                     const data = await response.json();
             
-                    setStore({ users: data.users }); // Guardar la lista de usuarios en el store
+                    setStore({ users: data.users }); 
             
                 } catch (error) {
                     console.error("Error en getUsers:", error);
@@ -207,7 +207,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         method: "PUT",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${getStore().token}`, // Token del store
+                            Authorization: `Bearer ${getStore().token}`, 
                         },
                     });
             

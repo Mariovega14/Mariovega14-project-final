@@ -69,17 +69,17 @@ const CardProduct = ({ id, name, price, stock, image }) => {
                     {store.role === "admin" && (
                         <div className="admin-buttons">
                             <button className="edit-button" onClick={handleEditClick}>
-                                ✏️ Editar
+                                ✏️
                             </button>
                             <button className="delete-button" onClick={handleDelete}>
-                                🗑️ Eliminar
+                                🗑️
                             </button>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Modal de Edición */}
+            
             {isOpen &&
                 ReactDOM.createPortal(
                     <>

@@ -35,7 +35,7 @@ const Orders = () => {
         <div className="orders-page">
             <h2>Órdenes</h2>
 
-            {/* 🔍 Filtros */}
+            
             <div className="filters">
                 <input
                     type="text"
@@ -80,7 +80,7 @@ const Orders = () => {
                 </ul>
             )}
 
-            {/* 📋 Modal con detalles de la orden */}
+            
             {selectedOrder && (
                 <>
                     <div className="modal-overlay" onClick={() => setSelectedOrder(null)}></div>

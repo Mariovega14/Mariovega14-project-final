@@ -8,7 +8,7 @@ import "../../styles/ventas.css";
 const Ventas = () => {
     const navigate = useNavigate();
     const { store, actions } = useContext(Context);
-    const [showCart, setShowCart] = useState(false); // Estado para mostrar el carrito
+    const [showCart, setShowCart] = useState(false); 
 
     useEffect(() => {
         const token = localStorage.getItem("token"); 
@@ -47,7 +47,7 @@ const Ventas = () => {
                 <ProductList />
             </div>
 
-            {/* Ventana desplegable del carrito */}
+            
             {showCart && <Cart onClose={() => setShowCart(false)} />}
         </div>
     );

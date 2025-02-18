@@ -47,7 +47,7 @@ h2 {
     background: #e9ecef;
 }
 
-/* MODAL DE DETALLES DE LA ORDEN */
+
 .order-modal {
     position: fixed;
     top: 50%;
@@ -62,7 +62,7 @@ h2 {
     max-width: 500px;
 }
 
-/* Fondo oscuro detrás del modal */
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -73,7 +73,7 @@ h2 {
     z-index: 999;
 }
 
-/* Estilo para los detalles de la orden */
+
 .order-details {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -110,7 +110,7 @@ h2 {
     background: #f8f9fa;
 }
 
-/* Botón de cierre */
+
 .close-btn {
     display: block;
     width: 100%;
@@ -143,7 +143,7 @@ h2 {
     font-family: Arial, sans-serif;
 }
 
-/* Encabezado de la factura */
+
 .invoice-header {
     text-align: center;
     margin-bottom: 20px;
